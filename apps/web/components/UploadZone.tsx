@@ -16,13 +16,16 @@ interface Props {
 }
 
 export function UploadZone({ onFile, onError }: Props) {
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: ACCEPTED_TYPES,
     maxSize: MAX_BYTES,
     multiple: false,
     noClick: false,
+    noKeyboard: false,
     onDropAccepted: (files) => {
-      if (files[0]) onFile(files[0]);
+      if (files[0]) {
+        onFile(files[0]);
+      }
     },
     onDropRejected: (rejections) => {
       const error = rejections[0]?.errors[0];
@@ -50,13 +53,14 @@ export function UploadZone({ onFile, onError }: Props) {
         </div>
       </div>
 
-      {/* Viewfinder Drop Zone */}
+      {/* Viewfinder Drop Zone (entire container triggers file picker) */}
       <div
         {...getRootProps()}
         className={`viewfinder-box upload-drop-zone reticle-grid flex-1 ${
           isDragActive ? 'drag-active' : ''
         }`}
         id="upload-zone"
+        tabIndex={0}
       >
         {/* Signature Viewfinder Corner Brackets */}
         <div className="viewfinder-corner viewfinder-corner-tl" />
@@ -98,17 +102,9 @@ export function UploadZone({ onFile, onError }: Props) {
           </p>
         </div>
 
-        <button
-          id="choose-file-btn"
-          type="button"
-          className="btn-instrument mb-4"
-          onClick={(e) => {
-            e.stopPropagation();
-            open();
-          }}
-        >
+        <div className="btn-instrument mb-4">
           Select Target Image
-        </button>
+        </div>
 
         {/* Technical Specs Footer */}
         <div
