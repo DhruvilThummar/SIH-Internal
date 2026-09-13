@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function UploadZone({ onFile, onError }: Props) {
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: ACCEPTED_TYPES,
     maxSize: MAX_BYTES,
     multiple: false,
@@ -102,9 +102,13 @@ export function UploadZone({ onFile, onError }: Props) {
           </p>
         </div>
 
-        <div className="btn-instrument mb-4">
+        <button
+          type="button"
+          className="btn-instrument mb-4"
+          onClick={(e) => { e.stopPropagation(); open(); }}
+        >
           Select Target Image
-        </div>
+        </button>
 
         {/* Technical Specs Footer */}
         <div

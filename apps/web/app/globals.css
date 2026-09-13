@@ -366,6 +366,27 @@ body {
   text-transform: uppercase;
 }
 
+/* ─── Full-Screen Result Takeover ─────────────────────────────────────────────── */
+/* When results arrive, the panel expands to fill all space below the sticky header */
+.fullscreen-result-takeover {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  animation: fadeSlideIn 0.3s ease;
+}
+
+.fullscreen-center {
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ─── Result & Case File Layout ──────────────────────────────────────────────── */
 .result-grid {
   flex: 1;
