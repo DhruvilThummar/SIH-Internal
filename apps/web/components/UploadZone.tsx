@@ -1,7 +1,7 @@
 'use client';
 
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, Focus, ShieldCheck } from 'lucide-react';
+import { UploadCloud, Focus, ShieldCheck, Scan } from 'lucide-react';
 
 const ACCEPTED_TYPES = {
   'image/jpeg': ['.jpg', '.jpeg'],
@@ -37,38 +37,23 @@ export function UploadZone({ onFile, onError }: Props) {
   });
 
   return (
-    <div className="upload-wrapper">
-      {/* Instrument Title & Subtitle */}
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <h1
-          style={{
-            fontFamily: 'var(--font-prose)',
-            fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
-            fontWeight: 600,
-            letterSpacing: '-0.02em',
-            color: 'var(--ink-text)',
-            marginBottom: '0.5rem',
-          }}
-        >
-          Optical Authenticity Scanner
-        </h1>
-        <p
-          style={{
-            fontFamily: 'var(--font-prose)',
-            color: 'var(--ink-muted)',
-            fontSize: '0.95rem',
-            maxWidth: '540px',
-            margin: '0 auto',
-          }}
-        >
-          Target an image to compute a calibrated probability index (Real vs Synthetic AI-Generated).
-        </p>
+    <div className="upload-wrapper flex flex-col h-full w-full">
+      {/* Instrument Title Badge Header */}
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-[var(--border-line)]">
+        <div className="flex items-center gap-2 font-mono-data text-xs font-bold text-[var(--ink-text)] tracking-wider uppercase">
+          <Scan size={15} className="text-[var(--teal-real)]" />
+          <span>OPTICAL VIEWFINDER SCANNER</span>
+        </div>
+        <div className="flex items-center gap-1.5 font-mono-data text-[0.7rem] text-[var(--teal-real)]">
+          <span className="w-2 h-2 rounded-full bg-[var(--teal-real)] animate-pulse inline-block" />
+          <span>LIVE RETICLE</span>
+        </div>
       </div>
 
       {/* Viewfinder Drop Zone */}
       <div
         {...getRootProps()}
-        className={`viewfinder-box upload-drop-zone reticle-grid ${
+        className={`viewfinder-box upload-drop-zone reticle-grid flex-1 ${
           isDragActive ? 'drag-active' : ''
         }`}
         id="upload-zone"
@@ -81,11 +66,11 @@ export function UploadZone({ onFile, onError }: Props) {
 
         <input {...getInputProps()} id="file-input" />
 
-        <div className="upload-icon-ring">
+        <div className="upload-icon-ring mb-4">
           {isDragActive ? (
-            <Focus size={28} strokeWidth={2} />
+            <Focus size={32} strokeWidth={2} />
           ) : (
-            <UploadCloud size={28} strokeWidth={2} />
+            <UploadCloud size={32} strokeWidth={2} />
           )}
         </div>
 
@@ -93,10 +78,11 @@ export function UploadZone({ onFile, onError }: Props) {
           <p
             style={{
               fontFamily: 'var(--font-mono)',
-              fontWeight: 600,
-              fontSize: '1rem',
+              fontWeight: 700,
+              fontSize: '1.05rem',
               color: 'var(--ink-text)',
-              marginBottom: '0.35rem',
+              marginBottom: '0.4rem',
+              letterSpacing: '0.02em',
             }}
           >
             {isDragActive ? 'TARGET LOCKED — DROP TO SCAN' : 'POSITION IMAGE IN VIEWFINDER'}
@@ -104,18 +90,18 @@ export function UploadZone({ onFile, onError }: Props) {
           <p
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.78rem',
+              fontSize: '0.8rem',
               color: 'var(--ink-muted)',
             }}
           >
-            Drag & drop image file or click anywhere in viewfinder
+            Drag &amp; drop image file or click anywhere in viewfinder
           </p>
         </div>
 
         <button
           id="choose-file-btn"
           type="button"
-          className="btn-instrument"
+          className="btn-instrument mb-4"
           onClick={(e) => {
             e.stopPropagation();
             open();
@@ -128,34 +114,36 @@ export function UploadZone({ onFile, onError }: Props) {
         <div
           className="font-mono-data"
           style={{
-            marginTop: '1.5rem',
-            fontSize: '0.7rem',
+            fontSize: '0.72rem',
             color: 'var(--ink-faint)',
             display: 'flex',
-            gap: '1rem',
+            alignItems: 'center',
+            gap: '0.75rem',
+            background: 'var(--surface-subtle)',
+            padding: '0.35rem 0.85rem',
+            borderRadius: '2px',
+            border: '1px solid var(--border-line)',
           }}
         >
           <span>FORMATS: JPG · PNG · WEBP</span>
-          <span>•</span>
+          <span>|</span>
           <span>MAX: 16 MB</span>
         </div>
       </div>
 
-      {/* Disclaimer */}
+      {/* Security Guarantee Note */}
       <div
         style={{
-          marginTop: '1.5rem',
+          marginTop: '0.85rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
+          gap: '0.4rem',
           color: 'var(--ink-muted)',
-          fontSize: '0.76rem',
+          fontSize: '0.75rem',
         }}
       >
-        <ShieldCheck size={16} style={{ color: 'var(--teal-real)' }} />
-        <span>
-          Evaluates synthetic artifacts only. For general authenticity assessment.
-        </span>
+        <ShieldCheck size={15} style={{ color: 'var(--teal-real)' }} />
+        <span>In-memory processing only · Zero server image retention.</span>
       </div>
     </div>
   );
