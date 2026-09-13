@@ -1,0 +1,3 @@
+# This directory holds trained model weights and calibration files.
+# These files are excluded from git (see .gitignore).
+# Download pre-trained weights from the GitHub Releases page (see README.md).

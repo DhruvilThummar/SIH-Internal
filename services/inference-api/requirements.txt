@@ -1,0 +1,8 @@
+# services/inference-api — Python dependencies
+# This file lists only the API-layer deps.
+# The full stack (including ML) is in the root requirements.txt.
+# Install root requirements.txt first, then this file is a subset of it.
+
+flask>=3.0.0
+flask-cors>=4.0.0
+Pillow>=10.4.0

@@ -1,0 +1,40 @@
+# ── Model weights & calibration ────────────────────────────────────────────────
+ml/weights/*.pth
+ml/weights/temperature.json
+ml/weights/class_to_idx.json
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+.env
+*.env
+
+# ── Next.js / Node ────────────────────────────────────────────────────────────
+apps/web/node_modules/
+apps/web/.next/
+apps/web/out/
+apps/web/.env*.local
+
+# ── OS / Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Test images ───────────────────────────────────────────────────────────────
+# Never commit images of real identifiable people.
+*.jpg
+*.jpeg
+*.png
+*.webp
+!report/*.png
