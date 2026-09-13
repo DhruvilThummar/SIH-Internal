@@ -1,67 +1,133 @@
-# SignalScope — System Architecture
+# SignalScope — Master Two-Stage Hybrid Architecture & Forensic Engine
+
+<div align="center">
+
+**SIH 2026 Internal Hackathon · L.J. Institute of Engineering and Technology**  
+*Problem Statement PS-2: Two-Stage Hybrid Architecture & Faithful Forensic Explainability*
+
+</div>
 
 ---
 
-## 1. System Overview
+## 1. Executive Summary & Core Objectives
+
+SignalScope is an enterprise-grade digital image authentication system engineered specifically for:
+1. **Zero-Shot Generalization**: Reliable detection across unseen AI image generators (*FLUX.1, Midjourney v6, SDXL, DALL-E 3, StyleGAN 3*) without overfitting to training set noise fingerprints.
+2. **Faithful Forensic Explainability**: Non-hallucinated empirical evidence coupled with Zero-Point Anchored Bipolar Spatial Attribution heatmaps ($S_p$) and Pixel-Level Error Level Analysis (ELA).
+
+---
+
+## 2. System Pipeline Architecture
 
 ```
-User (Browser Interface)
-       │  Upload Target Image (JPG / PNG / WEBP)
-       ▼
-Next.js Frontend (Upload Zone + 3-Way Viewfinder Dashboard)
-       │  POST /predict  (Untouched Raw Binary Stream)
-       ▼
-Flask Defense-Grade Inference API
-       │  Sanitize → Dual-Stream Execution → Arbitration
-       ▼
-┌────────────────────────────────────────────────────────┐
-│ Stream A: Vision Foundation Backbone (Letterbox Input)  │
-│ └── LayerNorm Bipolar Attribution Heatmap              │
-├────────────────────────────────────────────────────────┤
-│ Stream B: Multi-Vector Forensics Engine (RAW Crops)    │
-│ ├── 2D Fast Fourier Spectrum + JPEG 8x8 DCT Notch      │
-│ ├── Bayer Cross-Channel Correlation (corr_rg > 0.60)   │
-│ ├── Pixel-Level Error Level Analysis (ELA Seams)       │
-│ └── EXIF Physics Cross-Validation Engine               │
-└────────────────────────────────────────────────────────┘
-       │  Calibrated Ensemble Probability + Structured Evidence Cards
-       ▼
-Responsible-Language Formatter ("likely AI-generated", never "fake")
-       │
-       ▼
-JSON API Response → Frontend renders 3-Way Viewfinder Overlay
+                       [ Untouched Raw Binary Stream / Image Payload ]
+                                             │
+                                             ▼
+                                 [ Forensic Image Sanitizer ]
+                                 ├── Alpha Channel Compositing (White Canvas)
+                                 └── sRGB Color Space Profile Standardiser
+                                             │
+                       ┌─────────────────────┴─────────────────────┐
+                       ▼                                           ▼
+          [ Stream A: ViT Backbone ]                 [ Stream B: Forensics Engine ]
+          • Letterbox Aspect Padding                 • Native RAW 512x512 Crops (5 Locations)
+          • L2 Feature Normalization                 • 2D Fast Fourier (FFT) + JPEG 8x8 Notch Filter
+          • LayerNorm Bipolar Attribution            • Bayer Noise Correlation (corr_rg > 0.60)
+          • valid_roi Coordinate Map                 • Pixel-Level Error Level Analysis (ELA)
+                                                     • EXIF Physics Cross-Validation
+                       │                                           │
+                       └─────────────────────┬─────────────────────┘
+                                             ▼
+                             [ Evidence Arbitration Matrix ]
+                             ├── Social Media Re-compression Handling
+                             ├── Smartphone Computational Photography Gate
+                             ├── Localized Inpainting Seam Detector
+                             └── Adaptive TTA Anti-Grain Defense Gating
+                                             │
+                                             ▼
+                               [ Defense-Grade JSON API ]
+                               ├── Verdict & Calibrated Confidence (%)
+                               ├── 3-Way Viewfinder Canvas Overlay
+                               └── Faithful Structured Evidence Cards
 ```
 
 ---
 
-## 2. System Components
+## 3. Mathematical & Forensic Formulations
 
-### 2.1 Frontend (`apps/web`)
+### 3.1 LayerNorm Bipolar Spatial Attribution ($S_p$)
+For Vision Transformer (ViT) backbones, patch attribution $A_p$ is computed on LayerNorm-normalized patch features $\operatorname{LN}(f_p)$ projected through probe weights $w$:
 
-- **Framework**: Next.js (TypeScript) + Vanilla CSS + Framer Motion.
+$$A_p = \alpha_{\text{CLS} \to p} \cdot \left(w^T \operatorname{LN}(f_p)\right)$$
+
+where $\alpha_{\text{CLS} \to p}$ represents the last-layer self-attention weights from the `[CLS]` token to patch $p$.
+
+Normalized via **Zero-Point Anchored Scaling**:
+
+$$S_p = \frac{A_p}{\max(|A_p|) + 1e-9}$$
+
+- $S_p > +0.15 \implies$ **Turbo Palette** (AI Glitch / Red-Yellow)
+- $-0.15 \le S_p \le +0.15 \implies \alpha = 0$ (Transparent / Neutral background)
+- $S_p < -0.15 \implies$ **Cyan-Blue Palette** (Authentic Optical Camera Evidence)
+
+---
+
+### 3.2 JPEG $8 \times 8$ DCT Grid Notch Filter
+Fundamental JPEG block boundary frequencies are masked out in 2D FFT magnitude spectrum $\mathcal{M}(u, v)$ to prevent compressed real photographs from triggering false-positive AI spectral spikes:
+
+$$\text{Mask}_{\text{JPEG}}(u, v) = \begin{cases} 0 & \text{if } u \text{ or } v \equiv 0 \pmod{H/8, W/8} \\ 1 & \text{otherwise} \end{cases}$$
+
+---
+
+### 3.3 Bayer Cross-Channel Noise Correlation ($\rho_{R, G}$)
+Optical camera sensors produce correlated noise residuals across RGB channels due to Bayer demosaicing interpolation:
+
+$$\rho_{R, G} = \frac{\operatorname{Cov}(R_{\text{res}}, G_{\text{res}})}{\sigma_{R_{\text{res}}} \cdot \sigma_{G_{\text{res}}}}$$
+
+- $\rho_{R, G} > 0.60 \implies$ Verified Optical Sensor (defends iPhone/Pixel beauty filters & bokeh from false positive AI verdicts)
+- $\rho_{R, G} \le 0.60$ with low noise std $\implies$ Synthetic AI Diffusion
+
+---
+
+### 3.4 Pixel-Level Error Level Analysis ($\Delta_{\text{ELA}}$)
+Micro-inpainting and Generative Fill edits are localized by re-compressing the image at a known 90% JPEG quality factor:
+
+$$\Delta_{\text{ELA}} = |I_{\text{orig}} - I_{\text{JPEG}}| \times 15.0$$
+
+High localized quantization contrast ($\text{Ratio} > 4.2$) pinpoints inpainted seams and object manipulation.
+
+---
+
+## 4. System Components Breakdown
+
+### 4.1 Frontend (`apps/web`)
+- **Framework**: Next.js 16 (TypeScript) + Tailwind CSS + Framer Motion.
 - **Upload Zone**: `UploadZone.tsx` with corner-bracket viewfinder aesthetic and `react-dropzone`.
 - **Viewfinder Dashboard**: `ResultPanel.tsx` featuring a **3-Way Multi-Spectrum Switcher**:
   - 📷 **Optical View**: Original input image.
   - 🎯 **AI Attribution Heatmap**: LayerNorm Bipolar Turbo/Cyan canvas overlay bounded strictly to `valid_roi`.
   - 🔬 **ELA Compression Seam Map**: Glowing pixel-level inpainting seam map.
 - **Case File Readout**:
-  - Horizontal Real ↔ AI Probability Spectrum Gauge with animated needle indicator.
+  - Horizontal Real ↔ AI Probability Spectrum Gauge with animated needle pointer.
   - Faithful Structured Evidence Cards (Primary Spatial, Secondary Texture, Spectral Frequency, Metadata Verification).
   - 4 Invariant Forensic Signal Cards (PRNU Noise, 2D Fourier, ELA Seams, Bayer Correlation).
 
-### 2.2 Inference API (`services/inference-api`)
+---
 
+### 4.2 Inference API (`services/inference-api`)
 - **Framework**: Flask + Flask-CORS.
 - **Endpoint**: `POST /predict` accepts multipart raw image stream, passes `io.BytesIO` directly to prevent re-compression artifacts.
 - **Singleton Model Loader**: Pre-loads model weights and temperature scaling once at startup.
 
-### 2.3 Machine Learning & Forensics Engine (`ml/src`)
+---
 
-| Module | File | Purpose |
-|--------|------|---------|
+### 4.3 Machine Learning & Forensics Engine (`ml/src`)
+
+| Module | File | Purpose & Defense Mechanism |
+|--------|------|-----------------------------|
 | **Sanitizer** | `forensics/sanitizer.py` | Alpha channel compositing (neutral white canvas) & sRGB ICC standardization. |
 | **Spectral Engine** | `forensics/spectral.py` | PyTorch CUDA 2D FFT, JPEG $8 \times 8$ DCT Notch Filter, Screen Moiré Recapture Gate. |
-| **Texture Engine** | `forensics/texture.py` | Multi-patch PRNU spatial noise residual & Bayer Cross-Channel Correlation (`corr_rg > 0.60`). |
+| **Texture Engine** | `forensics/texture.py` | Multi-patch PRNU spatial noise residual & Bayer Cross-Channel Correlation ($\rho_{R,G} > 0.60$). |
 | **ELA Engine** | `forensics/ela.py` | Pixel-level Error Level Analysis ($\Delta_{\text{ELA}}$) for micro-inpainting seam detection. |
 | **Metadata Engine** | `forensics/metadata.py` | EXIF metadata parsing & EXIF Physics Cross-Validation. |
 | **Model Utils** | `model_utils.py` | Letterbox padding, LayerNorm Bipolar Attribution, and `valid_roi` coordinate mapping. |
@@ -70,60 +136,56 @@ JSON API Response → Frontend renders 3-Way Viewfinder Overlay
 
 ---
 
-## 3. Data Flow
+## 5. Benchmark & Faithfulness Evaluation Protocol
 
-```
-1. Image Upload (Browser)
-       │  Binary Stream
-       ▼
-2. Forensic Sanitization
-       │  Alpha Composited RGB + sRGB Profile
-       ▼
-3. Dual-Stream Parallel Feature Extraction
-       ├── Stream A: Vision Foundation Backbone (LayerNorm Bipolar Heatmap)
-       └── Stream B: 5 Native RAW Crops (FFT Notch + Bayer Corr + ELA + EXIF)
-       ▼
-4. Evidence Arbitration & Ensemble Fusion
-       │  Resolves social media re-compression conflicts & smartphone beauty filters
-       ▼
-5. Responsible-Language Verdict Formatting
-       │  "likely AI-generated" / "likely real" / "uncertain — low confidence"
-       ▼
-6. JSON Response Delivery to Frontend Dashboard
-```
+### 5.1 Standard Benchmark Datasets
+SignalScope is evaluated across three core benchmark categories:
+1. **AI-Generated & Diffusion Detection Datasets**:
+   - **GenImage** (`GenImage/GenImage_mini` on Hugging Face): 1M+ images (Stable Diffusion v1.4/v1.5, Midjourney, DALL-E, GLIDE, VQDM, BigGAN vs ImageNet real photos).
+   - **Synthbuster** (Zenodo): High-resolution modern diffusion benchmark (Midjourney v5, DALL-E 3, SDXL, Adobe Firefly).
+2. **Local Inpainting & Tampering Datasets**:
+   - **DEFACTO**: 220,000+ images with ground truth masks for inpainting and ELA seam testing.
+   - **CASIA v2.0 / Columbia**: Academic benchmark for splicing and uncompressed editing.
+3. **PRNU, Sensor Noise & Social Media Compression**:
+   - **VISION Dataset**: 35 smartphones, WhatsApp/Facebook double-JPEG re-compressed versions.
+   - **Dresden Database**: 14,000+ RAW unprocessed images from 73 camera models.
 
 ---
 
-## 4. Repository Structure
+### 5.2 Evaluation Metrics
+- **Classification Metrics**: ROC-AUC, Average Precision (AP), Balanced Accuracy, Brier Score, ECE.
+- **Explainability Faithfulness Metrics**:
+  - **Deletion AUC (< 0.30)**: Measures rapid drop in $P(\text{AI})$ as top spatial patches are masked.
+  - **Insertion AUC (> 0.80)**: Measures rapid rise in $P(\text{AI})$ as top spatial patches are unmasked.
 
-```
-SIH/
-├── apps/
-│   └── web/                   # Next.js Frontend Dashboard
-│       ├── app/
-│       ├── components/
-│       │   ├── Header.tsx
-│       │   ├── UploadZone.tsx
-│       │   ├── LoadingState.tsx
-│       │   ├── ResultPanel.tsx
-│       │   └── HeatmapCanvas.tsx
-│       └── lib/
-├── services/
-│   └── inference-api/         # Flask Inference API
-│       └── app.py
-├── ml/
-│   ├── src/                   # Machine Learning & Forensics Engine
-│   │   ├── forensics/
-│   │   │   ├── sanitizer.py
-│   │   │   ├── spectral.py
-│   │   │   ├── texture.py
-│   │   │   ├── ela.py
-│   │   │   └── metadata.py
-│   │   ├── model_utils.py
-│   │   ├── predict.py
-│   │   ├── train.py
-│   │   ├── calibrate.py
-│   │   └── evaluate.py
-│   └── weights/               # Checkpoint weights & temperature.json
-└── docs/                      # Technical System Documentation
+---
+
+## 6. API Payload & Response Schema
+
+```json
+{
+  "label": "likely AI-generated",
+  "confidence": 0.968,
+  "prob_ai": 0.968,
+  "tampering_analysis": {
+    "is_fully_synthetic": true,
+    "has_localized_inpainting": false,
+    "adversarial_noise_injected": false
+  },
+  "evidence": {
+    "primary_spatial": "LayerNorm-normalized peak activation localized in subject patch; severe boundary blending discontinuity.",
+    "secondary_texture": "Bayer demosaicing cross-correlation (corr_rg=0.12) falls far below physical CMOS optical thresholds (>0.60).",
+    "spectral_frequency": "Periodic deconvolution grid harmonics identified at 45-degree radial axis.",
+    "metadata_consistency": "Stripped/Synthetic color profile detected; no physical sensor CFA signature present."
+  },
+  "heatmap_grid": [...],
+  "grid_dimensions": [16, 16],
+  "valid_roi": [0.0, 0.125, 1.0, 0.875],
+  "forensics": {
+    "fft_spectrum": { "score": 85, "detail": "Periodic upsampling grid harmonics detected in 2D FFT" },
+    "sensor_prnu": { "score": 92, "detail": "Synthetic multi-patch smooth noise residual" },
+    "color_saturation": { "score": 12, "detail": "Bayer noise correlation: 0.12" },
+    "ela_compression": { "score": 45, "detail": "Uniform quantization error distribution" }
+  }
+}
 ```

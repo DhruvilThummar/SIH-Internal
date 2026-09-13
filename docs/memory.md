@@ -49,8 +49,7 @@
 | File | Purpose |
 |------|---------|
 | [`prd.md`](./prd.md) | Product requirements, functional/non-functional specs, success metrics. |
-| [`architecture_twostage.md`](./architecture_twostage.md) | Two-stage hybrid pipeline architecture, math formulations, API payload schema. |
-| [`architecture.md`](./architecture.md) | System overview, repo structure, data flow, component breakdown. |
+| [`architecture.md`](./architecture.md) | Master two-stage hybrid architecture, math formulations, component breakdown, and API payload schema. |
 | [`forensics_research.md`](./forensics_research.md) | Mathematical foundations of optical forensics and robustness matrix. |
 | [`design.md`](./design.md) | Viewfinder aesthetic, 3-Way Multi-Spectrum Switcher, color system. |
 | [`phase.md`](./phase.md) | Multi-stage implementation roadmap and milestones. |

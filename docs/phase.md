@@ -35,4 +35,4 @@
 
 ## Phase 5: Benchmark & Evaluation Suite
 - [x] `evaluate.py`: Held-out evaluation suite computing ROC-AUC, AP, Balanced Accuracy, Brier Score, ECE, and Deletion & Insertion AUC curves.
-- [x] `docs/architecture_twostage.md`: Comprehensive system architecture and math documentation.
+- [x] `docs/architecture.md`: Master two-stage hybrid architecture and math documentation.

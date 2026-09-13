@@ -9,7 +9,7 @@
 [![API Status](https://img.shields.io/badge/API-Healthy-B5622E?style=for-the-badge&logo=flask)](http://localhost:5000/health)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js%2016-000000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![PyTorch](https://img.shields.io/badge/ML%20Engine-PyTorch-EE4C2C?style=for-the-badge&logo=pytorch)](https://pytorch.org/)
-[![Architecture](https://img.shields.io/badge/Architecture-Two--Stage%20Hybrid-20241F?style=for-the-badge)](file:///d:/Code/SIH/docs/architecture_twostage.md)
+[![Architecture](https://img.shields.io/badge/Architecture-Two--Stage%20Hybrid-20241F?style=for-the-badge)](file:///d:/Code/SIH/docs/architecture.md)
 
 </div>
 
@@ -213,8 +213,7 @@ SIH/
 │   └── weights/                  # Model weights (best.pth) & temperature.json
 ├── docs/                         # Technical Documentation & Specs
 │   ├── prd.md                    # Product Requirements Document
-│   ├── architecture_twostage.md    # Architecture Specification & Math
-│   ├── architecture.md           # System Component Breakdown & Flow
+│   ├── architecture.md           # Master Architecture Specification & Math
 │   ├── forensics_research.md     # Forensics Research Paper & Robustness
 │   ├── design.md                 # UI/UX & Color Palette Specification
 │   ├── memory.md                 # Project Memory & Decisions Log
@@ -317,7 +316,7 @@ python ml\src\evaluate.py --data_dir data\held_out
 Detailed architectural specs, research whitepapers, and design guidelines:
 
 - 📄 [Product Requirements Document (PRD)](file:///d:/Code/SIH/docs/prd.md)
-- 📐 [Two-Stage Hybrid Architecture Specification](file:///d:/Code/SIH/docs/architecture_twostage.md)
+- 📐 [Two-Stage Hybrid Architecture Specification](file:///d:/Code/SIH/docs/architecture.md)
 - 🔍 [System Component Breakdown & Flow](file:///d:/Code/SIH/docs/architecture.md)
 - 🔬 [Optical Forensics Research & Robustness Matrix](file:///d:/Code/SIH/docs/forensics_research.md)
 - 🎨 [UI/UX Specification & Color Tokens](file:///d:/Code/SIH/docs/design.md)
