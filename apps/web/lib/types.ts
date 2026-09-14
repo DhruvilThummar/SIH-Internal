@@ -1,6 +1,6 @@
 // Shared types used across the frontend.
 
-export type AppState = 'idle' | 'loading' | 'result' | 'error';
+export type AppState = 'idle' | 'loading' | 'result' | 'error' | 'batch' | 'compare';
 
 export interface ForensicMetric {
   score: number;       // 0 to 100
@@ -9,9 +9,11 @@ export interface ForensicMetric {
 
 /** Shape of the defense-grade JSON response from POST /predict */
 export interface PredictResult {
-  label:      string;   // "likely AI-generated" | "likely real" | "uncertain — low confidence"
-  confidence: number;   // calibrated probability 0–1
-  prob_ai?:   number;   // raw AI probability 0–1
+  label:                string;   // "likely AI-generated" | "likely real" | "uncertain — low confidence"
+  confidence:           number;   // calibrated probability 0–1
+  prob_ai?:             number;   // raw AI probability 0–1
+  suspected_generator?: string;   // e.g. "FLUX.1 (Schnell/Dev)", "Midjourney v6", "Optical CMOS Camera Sensor"
+  generator_confidence?:number;   // 0–1
   tampering_analysis?: {
     is_fully_synthetic:         boolean;
     has_localized_inpainting:   boolean;

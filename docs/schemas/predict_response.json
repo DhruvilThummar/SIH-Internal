@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PredictResult",
+  "description": "JSON schema specification for SignalScope POST /predict and POST /predict-url API responses.",
+  "type": "object",
+  "required": ["label", "confidence"],
+  "properties": {
+    "label": {
+      "type": "string",
+      "enum": ["likely AI-generated", "likely real", "uncertain — low confidence"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "prob_ai": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "suspected_generator": {
+      "type": "string"
+    },
+    "generator_confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "tampering_analysis": {
+      "type": "object",
+      "properties": {
+        "is_fully_synthetic": { "type": "boolean" },
+        "has_localized_inpainting": { "type": "boolean" },
+        "adversarial_noise_injected": { "type": "boolean" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "primary_spatial": { "type": "string" },
+        "secondary_texture": { "type": "string" },
+        "spectral_frequency": { "type": "string" },
+        "metadata_consistency": { "type": "string" }
+      }
+    },
+    "heatmap_grid": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "number" }
+      }
+    },
+    "grid_dimensions": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "valid_roi": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "forensics": {
+      "type": "object",
+      "properties": {
+        "fft_spectrum": { "$ref": "#/$defs/ForensicMetric" },
+        "sensor_prnu": { "$ref": "#/$defs/ForensicMetric" },
+        "color_saturation": { "$ref": "#/$defs/ForensicMetric" },
+        "ela_compression": { "$ref": "#/$defs/ForensicMetric" }
+      }
+    }
+  },
+  "$defs": {
+    "ForensicMetric": {
+      "type": "object",
+      "required": ["score", "detail"],
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "detail": { "type": "string" }
+      }
+    }
+  }
+}

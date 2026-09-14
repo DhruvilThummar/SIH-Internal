@@ -12,7 +12,7 @@ import {
   Zap, 
   CheckCircle2, 
   Lock,
-  Eye
+  Eye,
 } from 'lucide-react';
 
 import { Header }      from '@/components/Header';
@@ -21,10 +21,11 @@ import { UploadZone }  from '@/components/UploadZone';
 import { LoadingState } from '@/components/LoadingState';
 import { ResultPanel }  from '@/components/ResultPanel';
 import { ErrorState }   from '@/components/ErrorState';
+import { BatchPanel, type BatchItem } from '@/components/BatchPanel';
+import { ComparePanel } from '@/components/compare/ComparePanel';
 
 import type { AppState, PredictResult } from '@/lib/types';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000';
+import { analyzeImageFile, analyzeImageUrl } from '@/lib/api/client';
 
 export default function Home() {
   const [appState,   setAppState]   = useState<AppState>('idle');
@@ -32,8 +33,9 @@ export default function Home() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [fileName,   setFileName]   = useState('');
   const [errorMsg,   setErrorMsg]   = useState('');
+  const [batchFiles, setBatchFiles] = useState<File[]>([]);
 
-  // ── Inference ──────────────────────────────────────────────────────────────
+  // ── Single Image File Inference ───────────────────────────────────────────
   async function analyzeFile(file: File) {
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
@@ -41,26 +43,44 @@ export default function Home() {
     setAppState('loading');
 
     try {
-      const form = new FormData();
-      form.append('image', file);
-
-      const res = await fetch(`${API_BASE}/predict`, { method: 'POST', body: form });
-
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? `Server error ${res.status}`);
-      }
-
-      setResult(await res.json());
+      const res = await analyzeImageFile(file);
+      setResult(res);
       setAppState('result');
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-        setErrorMsg(`Cannot connect to inference API at ${API_BASE}. Please ensure Flask backend is running: python services/inference-api/app.py`);
-      } else {
-        setErrorMsg(msg);
-      }
+      setErrorMsg(msg);
       setAppState('error');
+    }
+  }
+
+  // ── Single Remote Image URL Inference (Phase 7) ───────────────────────────
+  async function analyzeUrl(url: string) {
+    setPreviewUrl(url);
+    setFileName(url.split('/').pop() || 'remote-image.jpg');
+    setAppState('loading');
+
+    try {
+      const res = await analyzeImageUrl(url);
+      setResult(res);
+      setAppState('result');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErrorMsg(msg);
+      setAppState('error');
+    }
+  }
+
+  function handleBatchFiles(files: File[]) {
+    setBatchFiles(files);
+    setAppState('batch');
+  }
+
+  function handleSelectBatchItem(item: BatchItem) {
+    if (item.result) {
+      setResult(item.result);
+      setPreviewUrl(item.previewUrl);
+      setFileName(item.file.name);
+      setAppState('result');
     }
   }
 
@@ -70,7 +90,9 @@ export default function Home() {
   }
 
   function reset() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setAppState('idle');
     setResult(null);
     setPreviewUrl(null);
@@ -80,9 +102,9 @@ export default function Home() {
 
   return (
     <div className="app-shell">
-      <Header />
+      <Header onCompareClick={() => setAppState('compare')} />
 
-      {/* ── FULL-SCREEN RESULT / LOADING / ERROR TAKEOVER ─── */}
+      {/* ── FULL-SCREEN RESULT / LOADING / ERROR / COMPARE / BATCH TAKEOVER ─── */}
       {appState === 'result' && result && previewUrl && (
         <div className="fullscreen-result-takeover">
           <ResultPanel
@@ -96,13 +118,27 @@ export default function Home() {
 
       {appState === 'loading' && (
         <div className="fullscreen-result-takeover fullscreen-center">
-          <LoadingState fileName={fileName} />
+          <LoadingState fileName={fileName} previewUrl={previewUrl ?? undefined} />
         </div>
       )}
 
       {appState === 'error' && (
         <div className="fullscreen-result-takeover fullscreen-center">
           <ErrorState message={errorMsg} onRetry={reset} />
+        </div>
+      )}
+
+      {appState === 'batch' && batchFiles.length > 0 && (
+        <BatchPanel
+          initialFiles={batchFiles}
+          onBack={reset}
+          onSelectSingleResult={handleSelectBatchItem}
+        />
+      )}
+
+      {appState === 'compare' && (
+        <div className="fullscreen-result-takeover">
+          <ComparePanel onBack={reset} />
         </div>
       )}
 
@@ -158,7 +194,12 @@ export default function Home() {
 
             {/* RIGHT COLUMN: CORE OPTICAL VIEWFINDER SCANNER */}
             <div className="hero-right-col">
-              <UploadZone onFile={analyzeFile} onError={handleValidationError} />
+              <UploadZone
+                onFile={analyzeFile}
+                onUrl={analyzeUrl}
+                onBatchFiles={handleBatchFiles}
+                onError={handleValidationError}
+              />
             </div>
 
           </section>
